@@ -1,7 +1,6 @@
 import random
 
 #Asignacion de valores
-
 camino_libre = 0
 edificio = 1
 agua = 2
@@ -24,19 +23,19 @@ def imprimir_laberinto(laberinto):
         for j in range(len(laberinto[i])):
             match laberinto[i][j]:
                 case 0:
-                    simbolo = "C"
+                    simbolo = "🟩"
                 case 1:
-                    simbolo = "T"
+                    simbolo = "🏢"
                 case 2:
-                    simbolo = "A"
+                    simbolo = "🌊"
                 case 3:
-                    simbolo = "Z"
+                    simbolo = "🚧"
                 case 4:
-                    simbolo = "I"
+                    simbolo = "🧍"
                 case 5:
-                    simbolo = "D"
+                    simbolo = "🏁"
             print(simbolo, end="  ")
-        print("")                                                                                
+        print("")                                                                              
         
 #Insertar elementos
 def insertar_elementos(laberinto, valor):
