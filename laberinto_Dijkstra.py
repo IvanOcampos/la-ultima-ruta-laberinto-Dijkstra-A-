@@ -1,20 +1,16 @@
 import random
 
 #Asignacion de valores
-camino_libre = 0
-edificio = 1
-agua = 2
-temp_zone = 3
-inicio = 4
-fin = 5
+CAMINO = 0
+EDIFICIO = 1
+AGUA = 2
+OBSTACULO = 3
+INICIO = 4
+FIN = 5
 
 #Crecion del laberinto
 def crear_laberinto(filas, columnas):
-    laberinto = [[camino_libre for _ in range(columnas)] for _ in range(filas)]
-    print('Ingrese la posicion deL INICIO de a uno')
-    insertar_elementos(laberinto, inicio)
-    print('Ingrese la posicion del DESTINO de a uno')
-    insertar_elementos(laberinto, fin)
+    laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
     return laberinto
 
 #Impresion del laberinto
@@ -44,7 +40,7 @@ def insertar_elementos(laberinto, valor):
             pos_input = input("Ingrese la posicion (columna, fila) separada por la coma: ")
             fila, columna = map(int, pos_input.split(","))
             if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)):
-                if (laberinto[columna][fila] == camino_libre):
+                if ((laberinto[columna][fila] == CAMINO) or (INICIO == valor or valor == FIN)):
                     laberinto[columna][fila] = valor
                     return laberinto
                 else:
@@ -56,6 +52,10 @@ def insertar_elementos(laberinto, valor):
 
 
 laberinto = crear_laberinto(filas = int(input("Ingrese la cantidad de filas: ")), columnas = int(input("Ingrese la cantidad de columnas: ")))
+print('Ingrese la posicion deL INICIO de a uno')
+insertar_elementos(laberinto, INICIO)
+print('Ingrese la posicion del DESTINO de a uno')
+insertar_elementos(laberinto, FIN)
 imprimir_laberinto(laberinto)
 
 #print(len(laberinto)) #cantidad de filas

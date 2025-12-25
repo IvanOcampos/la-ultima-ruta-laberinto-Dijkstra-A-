@@ -28,12 +28,12 @@ def generar_laberinto_dinamico(filas, columnas, complejidad=0.1):
                 cavar(nr, nc)
 
     # 2. Empezar a cavar desde una posición aleatoria (siempre impar)
-    cavar(1, 1)
+    cavar(0, 0)
 
     # 3. CREAR MÚLTIPLES CAMINOS (Braiding)
     # Rompemos paredes extra según el factor de complejidad
-    for i in range(1, f - 1):
-        for j in range(1, c - 1):
+    for i in range(0, f):
+        for j in range(0, c):
             if laberinto[i][j] == EDIFICIO:
                 if random.random() < complejidad:
                     laberinto[i][j] = CAMINO
@@ -63,7 +63,7 @@ def imprimir_laberinto(laberinto):
 f = 8#int(input("Filas: "))
 c = 8#int(input("Columnas: "))
 # Complejidad 0.1 significa que romperá el 10% de las paredes restantes
-mi_laberinto = generar_laberinto_dinamico(f, c, complejidad=0.2)
+mi_laberinto = generar_laberinto_dinamico(f, c)
 mi_laberinto[1][1] = ENTRADA
-mi_laberinto[6][3] = SALIDA
+mi_laberinto[6][6] = SALIDA
 imprimir_laberinto(mi_laberinto)
