@@ -38,9 +38,9 @@ def insertar_elementos(laberinto, valor):
     while True:
         try:
             pos_input = input("Ingrese la posicion (columna, fila) separada por la coma: ")
-            fila, columna = map(int, pos_input.split(","))
-            if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)):
-                if ((laberinto[columna][fila] == CAMINO) or (INICIO == valor or valor == FIN)):
+            fila, columna = map(int, pos_input.split(",")) #Separa cada valor tomando un marcador para hacerlo
+            if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)): #Establece los limites del laberinto
+                if ((laberinto[columna][fila] == CAMINO) or (INICIO == valor or valor == FIN)): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino, o si el valor es el inicio o la salida
                     laberinto[columna][fila] = valor
                     return laberinto
                 else:
