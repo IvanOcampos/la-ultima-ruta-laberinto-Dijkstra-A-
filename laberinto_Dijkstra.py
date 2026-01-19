@@ -1,6 +1,6 @@
 import random
 
-#Asignacion de valores
+#Asignacion de valores mediante constantes
 CAMINO = 0
 EDIFICIO = 1
 AGUA = 2
@@ -9,8 +9,39 @@ INICIO = 4
 FIN = 5
 
 #Crecion del laberinto
+
+#***PONER VALIDACION DE FILAS Y COLUMNAS
 def crear_laberinto(filas, columnas):
+    # Garantizamos que siempre sea impar para que tenga paredes 
+    if columnas % 2 == 0:
+        columnas += 1
+    if filas % 2 == 0:
+        filas += 1
+        
     laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
+    
+    
+    def crear_camino(x, y):
+        laberinto[y][x] = CAMINO
+        
+        direcciones = [(0, 2), (0, -2), (2, 0), (-2, 0)]
+        random.shuffle(direcciones)
+        
+        for dx, dy in direcciones:
+            nx, ny = x + dx, y + dy
+            
+            if (1 <= nx < columnas -1) and (1 <= ny < filas -1) and (laberinto[ny][nx] == EDIFICIO):
+                #Romper el muro entre la celda actual y la siguiente
+                laberinto[y + dy//2][x + dx//2] = CAMINO
+                crear_camino(nx, ny)
+
+    crear_camino(1, 1)
+    
+    #Creacion de mas caminos
+    for y in range(1, filas -1):
+        for x in range(1, columnas - 1):
+            if laberinto[y][x] == EDIFICIO and random.random() < 0.5:
+                laberinto[y][x] = CAMINO
     return laberinto
 
 #Impresion del laberinto
@@ -40,7 +71,7 @@ def insertar_elementos(laberinto, valor):
             pos_input = input("Ingrese la posicion (columna, fila) separada por la coma: ")
             fila, columna = map(int, pos_input.split(",")) #Separa cada valor tomando un marcador para hacerlo
             if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)): #Establece los limites del laberinto
-                if ((laberinto[columna][fila] == CAMINO) or (INICIO == valor or valor == FIN)): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino, o si el valor es el inicio o la salida
+                if ((laberinto[columna][fila] == CAMINO) ):#or (INICIO == valor or valor == FIN)): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino, o si el valor es el inicio o la salida
                     laberinto[columna][fila] = valor
                     return laberinto
                 else:
@@ -52,6 +83,7 @@ def insertar_elementos(laberinto, valor):
 
 
 laberinto = crear_laberinto(filas = int(input("Ingrese la cantidad de filas: ")), columnas = int(input("Ingrese la cantidad de columnas: ")))
+imprimir_laberinto(laberinto)
 print('Ingrese la posicion deL INICIO de a uno')
 insertar_elementos(laberinto, INICIO)
 print('Ingrese la posicion del DESTINO de a uno')
