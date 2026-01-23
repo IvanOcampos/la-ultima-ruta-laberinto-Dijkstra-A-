@@ -9,8 +9,6 @@ INICIO = 4
 FIN = 5
 
 #Crecion del laberinto
-
-#***PONER VALIDACION DE FILAS Y COLUMNAS
 def crear_laberinto(filas, columnas):
     # Garantizamos que siempre sea impar para que tenga paredes 
     if columnas % 2 == 0:
@@ -64,31 +62,48 @@ def imprimir_laberinto(laberinto):
             print(simbolo, end="  ")
         print("")                                                                              
         
-#Insertar elementos
+#Insertar cualquier elemento en el laberinto
 def insertar_elementos(laberinto, valor):
     while True:
         try:
             pos_input = input("Ingrese la posicion (columna, fila) separada por la coma: ")
             fila, columna = map(int, pos_input.split(",")) #Separa cada valor tomando un marcador para hacerlo
             if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)): #Establece los limites del laberinto
-                if ((laberinto[columna][fila] == CAMINO) ):#or (INICIO == valor or valor == FIN)): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino, o si el valor es el inicio o la salida
+                if ((laberinto[columna][fila] == CAMINO) ): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino
                     laberinto[columna][fila] = valor
                     return laberinto
                 else:
-                    print("NO SE PUEDE INSERTAR NINGUN CARACTER EN ESA POSICION PORQUE NO ES UN LUGAR DISPONIBLE O UN CAMINO LIBRE, INTENTELO NUEVAMENTE")
+                    print("NO SE PUEDE INSERTAR NINGUN CARACTER EN ESA POSICION PORQUE NO ES UN LUGAR DISPONIBLE. DEBE SER UN CAMINO LIBRE, INTENTELO NUEVAMENTE")
             else:
                 print("LA POSICION INGRESADA SALE DE LOS LIMITES DE LA MATRIZ")
         except ValueError:
             print("El formato de ingreso fue incorrecto debe de ser (columna, fila)!!!")
 
+#def dijkstra(laberinto):
+    
 
-laberinto = crear_laberinto(filas = int(input("Ingrese la cantidad de filas: ")), columnas = int(input("Ingrese la cantidad de columnas: ")))
-imprimir_laberinto(laberinto)
-print('Ingrese la posicion deL INICIO de a uno')
-insertar_elementos(laberinto, INICIO)
-print('Ingrese la posicion del DESTINO de a uno')
-insertar_elementos(laberinto, FIN)
-imprimir_laberinto(laberinto)
+def main():
+    #Validacion de entrada para el tamaño del laberinto
+    while True:
+        try:
+            filas  = int(input("Ingrese la cantidad de filas: "))
+            columnas = int(input("Ingrese la cantidad de columnas: "))
+            if (filas > 0) or (columnas > 0):
+                break
+            else:
+                print("Los numeros deben de ser mayores a 0. Intentelo nuevamente")
+        
+        except ValueError:
+            print("El valor ingresado debe de ser un numero entero mayor a 0")
 
+    laberinto = crear_laberinto(filas, columnas)
+    imprimir_laberinto(laberinto)
+    print('Ingrese la posicion deL INICIO de a uno')
+    insertar_elementos(laberinto, INICIO)
+    print('Ingrese la posicion del DESTINO de a uno')
+    insertar_elementos(laberinto, FIN)
+    imprimir_laberinto(laberinto)
+
+main()
 #print(len(laberinto)) #cantidad de filas
 #print(len(laberinto[0])) #cantidad de columnas 
