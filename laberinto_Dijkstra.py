@@ -1,4 +1,4 @@
-import random
+import random, heapq
 
 #Asignacion de valores mediante constantes
 CAMINO = 0
@@ -7,6 +7,7 @@ AGUA = 2
 OBSTACULO = 3
 INICIO = 4
 FIN = 5
+RUTA = 6
 
 #Crecion del laberinto
 def crear_laberinto(filas, columnas):
@@ -17,7 +18,6 @@ def crear_laberinto(filas, columnas):
         filas += 1
         
     laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
-    
     
     def crear_camino(x, y):
         laberinto[y][x] = CAMINO
@@ -59,6 +59,8 @@ def imprimir_laberinto(laberinto):
                     simbolo = "🧍"
                 case 5:
                     simbolo = "🏁"
+                case 6:
+                    simbolo = "🟥"
             print(simbolo, end="  ")
         print("")                                                                              
         
@@ -71,7 +73,7 @@ def insertar_elementos(laberinto, valor):
             if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)): #Establece los limites del laberinto
                 if ((laberinto[columna][fila] == CAMINO) ): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino
                     laberinto[columna][fila] = valor
-                    return laberinto
+                    return laberinto, (columna, fila)
                 else:
                     print("NO SE PUEDE INSERTAR NINGUN CARACTER EN ESA POSICION PORQUE NO ES UN LUGAR DISPONIBLE. DEBE SER UN CAMINO LIBRE, INTENTELO NUEVAMENTE")
             else:
@@ -79,8 +81,83 @@ def insertar_elementos(laberinto, valor):
         except ValueError:
             print("El formato de ingreso fue incorrecto debe de ser (columna, fila)!!!")
 
-#def dijkstra(laberinto):
+def dijkstra(laberinto, inicio, fin):
+    filas = len(laberinto)
+    columnas = len(laberinto[0])
     
+    direcciones = [(0,1), (0,-1), (1, 0), (-1,0)]
+    
+    costo = {
+        CAMINO: 1,
+        INICIO: 1,
+        FIN: 1,
+        AGUA: 3,
+        OBSTACULO: 9999,
+        EDIFICIO: None   
+    }
+    
+    #Validacion 
+    def es_valido(f, c):
+        if not(0 <= f < filas and 0 <= c < columnas):
+            return False
+        
+        celda = laberinto[f][c]
+        
+        if celda == EDIFICIO or celda == OBSTACULO:
+            return False
+        
+        return True
+    
+    distancia = [[float("inf")] * columnas for _ in range(filas)]
+    padre = [[None] * columnas for _ in range(filas)]
+    
+    #Inicializacion de la cola
+    cola = []
+    distancia[inicio[0]][inicio[1]] = 0
+    heapq.heappush(cola, (0, inicio))
+    
+    while cola:
+        distancia_actual, (f, c) = heapq.heappop(cola)
+        print("1")
+        #Salta si es un estado viejo
+        if distancia_actual != distancia[f][c]:
+            continue
+        
+        if (f, c) == fin: #Si la posicion ya es el fin corta(ya llego al minimo)
+            break
+        
+        for dir_f, dir_c in direcciones:
+            nueva_f, nueva_c = f + dir_f, c +dir_c
+            if not es_valido(nueva_f, nueva_c):
+                continue
+            
+            celda = laberinto[nueva_f][nueva_c]
+            peso = costo.get(celda, 1)
+        
+            nuevo_peso = distancia_actual + peso
+        
+            if nuevo_peso < distancia[nueva_f][nueva_c]:
+                distancia[nueva_f][nueva_c] = nuevo_peso
+                padre[nueva_f][nueva_c] = (f, c)
+                heapq.heappush(cola, (nuevo_peso, (nueva_f, nueva_c)))
+                
+    if distancia[fin[0]][fin[1]] == float("inf"):
+        print("NO EXISTE CAMINO POSIBLE ENTRE INICIO Y FIN")
+        return None
+    
+    camino = []
+    actual = fin
+    while actual is not None:
+        camino.append(actual)
+        actual = padre[actual[0]][actual[1]]
+    
+    print(f"Camino encontrado. Pasos: {len(camino) - 1} | Costo total: {distancia[fin[0]][fin[1]]}")    
+    
+    for(ruta_fila, ruta_columna) in camino:
+        if(ruta_fila, ruta_columna) != inicio and (ruta_fila, ruta_columna) != fin:
+            laberinto[ruta_fila][ruta_columna] = RUTA
+    
+    return camino   
 
 def main():
     #Validacion de entrada para el tamaño del laberinto
@@ -99,10 +176,14 @@ def main():
     laberinto = crear_laberinto(filas, columnas)
     imprimir_laberinto(laberinto)
     print('Ingrese la posicion deL INICIO de a uno')
-    insertar_elementos(laberinto, INICIO)
+    laberinto, inicio = insertar_elementos(laberinto, INICIO)
     print('Ingrese la posicion del DESTINO de a uno')
-    insertar_elementos(laberinto, FIN)
+    laberinto, fin = insertar_elementos(laberinto, FIN)
     imprimir_laberinto(laberinto)
+    
+    camino = dijkstra(laberinto, inicio, fin)
+    if camino:
+        imprimir_laberinto(laberinto)
 
 main()
 #print(len(laberinto)) #cantidad de filas
