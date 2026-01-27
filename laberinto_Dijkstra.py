@@ -1,4 +1,5 @@
-import random, heapq
+import random, heapq, copy
+
 
 #Asignacion de valores mediante constantes
 CAMINO = 0
@@ -87,7 +88,7 @@ def dijkstra(laberinto, inicio, fin):
     
     direcciones = [(0,1), (0,-1), (1, 0), (-1,0)]
     
-    costo = {
+    costo = { #Diccionario de costos
         CAMINO: 1,
         INICIO: 1,
         FIN: 1,
@@ -96,7 +97,7 @@ def dijkstra(laberinto, inicio, fin):
         EDIFICIO: None   
     }
     
-    #Validacion 
+    #Validacion para las coordenadas de la cola
     def es_valido(f, c):
         if not(0 <= f < filas and 0 <= c < columnas):
             return False
@@ -108,7 +109,7 @@ def dijkstra(laberinto, inicio, fin):
         
         return True
     
-    distancia = [[float("inf")] * columnas for _ in range(filas)]
+    distancia = [[float("inf")] * columnas for _ in range(filas)] 
     padre = [[None] * columnas for _ in range(filas)]
     
     #Inicializacion de la cola
@@ -118,6 +119,7 @@ def dijkstra(laberinto, inicio, fin):
     
     while cola:
         distancia_actual, (f, c) = heapq.heappop(cola)
+        lab_copia = copy.deepcopy(laberinto)
         #Salta si es un estado viejo
         if distancia_actual != distancia[f][c]:
             continue
@@ -140,10 +142,12 @@ def dijkstra(laberinto, inicio, fin):
                 padre[nueva_f][nueva_c] = (f, c)
                 heapq.heappush(cola, (nuevo_peso, (nueva_f, nueva_c)))
                 
+    #Condicion para cuando no exista camino o esten todos tapados
     if distancia[fin[0]][fin[1]] == float("inf"):
         print("NO EXISTE CAMINO POSIBLE ENTRE INICIO Y FIN")
-        return None
+        return None, lab_copia
     
+    #Guardar en una lista utilizable el resultado de la cola
     camino = []
     actual = fin
     while actual is not None:
@@ -152,18 +156,12 @@ def dijkstra(laberinto, inicio, fin):
     
     print(f"Camino encontrado. Pasos: {len(camino) - 1} | Costo total: {distancia[fin[0]][fin[1]]}")    
     
+    #Marcamos el camino encontrado
     for(ruta_fila, ruta_columna) in camino:
         if(ruta_fila, ruta_columna) != inicio and (ruta_fila, ruta_columna) != fin:
-            laberinto[ruta_fila][ruta_columna] = RUTA
+            lab_copia[ruta_fila][ruta_columna] = RUTA
     
-    return camino
-
-def limpiar_ruta(laberinto):
-    for f in range(len(laberinto)):
-        for c in range(len(laberinto[0])):
-            if laberinto[f][c] == RUTA:
-                laberinto[f][c] = CAMINO
-    return laberinto
+    return camino, lab_copia
 
 def main():
     #Validacion de entrada para el tamaño del laberinto
@@ -187,14 +185,15 @@ def main():
     laberinto, fin = insertar_elementos(laberinto, FIN)
     imprimir_laberinto(laberinto)
     
+    #Bucle para los obstaculos
     while True:
-        camino = dijkstra(laberinto, inicio, fin)
+        camino, lab_copia = dijkstra(laberinto, inicio, fin)
         if camino is None:
-            imprimir_laberinto(laberinto)
+            imprimir_laberinto(lab_copia)
             break
         
         if camino:
-            imprimir_laberinto(laberinto)
+            imprimir_laberinto(lab_copia)
         
             
         while True:
@@ -207,7 +206,6 @@ def main():
             except ValueError:
                 print('El valor ingresado debe de ser "SI" o "NO"')
         if deseo == "si":
-            laberinto = limpiar_ruta(laberinto)
             texto = """
 ¿Que tipo de objeto desea agregar?
     1-OBSTACULO "🚧"
@@ -233,5 +231,3 @@ def main():
             break
 
 main()
-#print(len(laberinto)) #cantidad de filas
-#print(len(laberinto[0])) #cantidad de columnas 
