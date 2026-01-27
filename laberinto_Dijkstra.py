@@ -71,7 +71,7 @@ def insertar_elementos(laberinto, valor):
             pos_input = input("Ingrese la posicion (columna, fila) separada por la coma: ")
             fila, columna = map(int, pos_input.split(",")) #Separa cada valor tomando un marcador para hacerlo
             if (0 <= columna < len(laberinto[0])) and (0 <= fila < len(laberinto)): #Establece los limites del laberinto
-                if ((laberinto[columna][fila] == CAMINO) ): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino
+                if ((laberinto[columna][fila] == CAMINO or laberinto[columna][fila] == OBSTACULO or laberinto[columna][fila] == AGUA) ): #Condiciona a que se escriba otro valor unicamente si en el lugar es un camino
                     laberinto[columna][fila] = valor
                     return laberinto, (columna, fila)
                 else:
@@ -92,7 +92,7 @@ def dijkstra(laberinto, inicio, fin):
         INICIO: 1,
         FIN: 1,
         AGUA: 3,
-        OBSTACULO: 9999,
+        OBSTACULO: 999999,
         EDIFICIO: None   
     }
     
@@ -118,7 +118,6 @@ def dijkstra(laberinto, inicio, fin):
     
     while cola:
         distancia_actual, (f, c) = heapq.heappop(cola)
-        print("1")
         #Salta si es un estado viejo
         if distancia_actual != distancia[f][c]:
             continue
@@ -157,7 +156,14 @@ def dijkstra(laberinto, inicio, fin):
         if(ruta_fila, ruta_columna) != inicio and (ruta_fila, ruta_columna) != fin:
             laberinto[ruta_fila][ruta_columna] = RUTA
     
-    return camino   
+    return camino
+
+def limpiar_ruta(laberinto):
+    for f in range(len(laberinto)):
+        for c in range(len(laberinto[0])):
+            if laberinto[f][c] == RUTA:
+                laberinto[f][c] = CAMINO
+    return laberinto
 
 def main():
     #Validacion de entrada para el tamaño del laberinto
@@ -175,15 +181,56 @@ def main():
 
     laberinto = crear_laberinto(filas, columnas)
     imprimir_laberinto(laberinto)
-    print('Ingrese la posicion deL INICIO de a uno')
+    print('Ingrese la posicion del INICIO de a uno')
     laberinto, inicio = insertar_elementos(laberinto, INICIO)
     print('Ingrese la posicion del DESTINO de a uno')
     laberinto, fin = insertar_elementos(laberinto, FIN)
     imprimir_laberinto(laberinto)
     
-    camino = dijkstra(laberinto, inicio, fin)
-    if camino:
-        imprimir_laberinto(laberinto)
+    while True:
+        camino = dijkstra(laberinto, inicio, fin)
+        if camino is None:
+            imprimir_laberinto(laberinto)
+            break
+        
+        if camino:
+            imprimir_laberinto(laberinto)
+        
+            
+        while True:
+            try:
+                deseo = input("¿Desea ingresar un obstaculo? SI/NO: ").lower()
+                if "si" == deseo or deseo == "no":
+                    break
+                else:
+                    print('El valor ingresado debe de ser "SI" o "NO"')               
+            except ValueError:
+                print('El valor ingresado debe de ser "SI" o "NO"')
+        if deseo == "si":
+            laberinto = limpiar_ruta(laberinto)
+            texto = """
+¿Que tipo de objeto desea agregar?
+    1-OBSTACULO "🚧"
+    2-AGUA "🌊"
+    3-BORRAR
+    """
+            while True:
+                try:
+                    opcion = int(input(texto))
+                    if 1 == opcion:
+                        laberinto, _ = insertar_elementos(laberinto, OBSTACULO)
+                    elif 2 == opcion:
+                        laberinto, _ = insertar_elementos(laberinto, AGUA)
+                    elif 3 == opcion:
+                        laberinto, _ = insertar_elementos(laberinto, CAMINO)
+                    else:
+                        print("SOLO PUEDE ELEGIR UNA DE ESTAS 3 OPCIONES")
+                        
+                    break 
+                except ValueError:
+                    print('La unicas opciones disponibles son "1" y "2"')
+        else:
+            break
 
 main()
 #print(len(laberinto)) #cantidad de filas
