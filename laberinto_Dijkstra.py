@@ -119,7 +119,6 @@ def dijkstra(laberinto, inicio, fin):
     
     while cola:
         distancia_actual, (f, c) = heapq.heappop(cola)
-        lab_copia = copy.deepcopy(laberinto)
         #Salta si es un estado viejo
         if distancia_actual != distancia[f][c]:
             continue
@@ -142,6 +141,7 @@ def dijkstra(laberinto, inicio, fin):
                 padre[nueva_f][nueva_c] = (f, c)
                 heapq.heappush(cola, (nuevo_peso, (nueva_f, nueva_c)))
                 
+    lab_copia = copy.deepcopy(laberinto)
     #Condicion para cuando no exista camino o esten todos tapados
     if distancia[fin[0]][fin[1]] == float("inf"):
         print("NO EXISTE CAMINO POSIBLE ENTRE INICIO Y FIN")
