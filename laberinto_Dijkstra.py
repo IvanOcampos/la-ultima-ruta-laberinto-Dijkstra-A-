@@ -1,6 +1,5 @@
 import random, heapq, copy
 
-
 #Asignacion de valores mediante constantes
 CAMINO = 0
 EDIFICIO = 1
