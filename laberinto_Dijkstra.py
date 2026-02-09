@@ -9,6 +9,20 @@ INICIO = 4
 FIN = 5
 RUTA = 6
 
+class CrearLaberinto:
+    def __init__(self, filas, columnas):
+        if columnas % 2 == 0:
+            columnas += 1
+        if filas % 2 == 0:
+            filas += 1
+            
+        self.filas = filas
+        self.columnas = columnas
+        self.laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
+    
+    def crear_camino(self, x, y):
+        
+        
 #Crecion del laberinto
 def crear_laberinto(filas, columnas):
     # Garantizamos que siempre sea impar para que tenga paredes 
