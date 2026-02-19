@@ -21,62 +21,50 @@ class CrearLaberinto:
         self.laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
     
     def crear_camino(self, x, y):
-        
-        
-#Crecion del laberinto
-def crear_laberinto(filas, columnas):
-    # Garantizamos que siempre sea impar para que tenga paredes 
-    if columnas % 2 == 0:
-        columnas += 1
-    if filas % 2 == 0:
-        filas += 1
-        
-    laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
-    
-    def crear_camino(x, y):
-        laberinto[y][x] = CAMINO
+        self.laberinto[y][x] = CAMINO
         
         direcciones = [(0, 2), (0, -2), (2, 0), (-2, 0)]
         random.shuffle(direcciones)
         
         for dx, dy in direcciones:
-            nx, ny = x + dx, y + dy
+            ny, nx = dy + y, dx + x
             
-            if (1 <= nx < columnas -1) and (1 <= ny < filas -1) and (laberinto[ny][nx] == EDIFICIO):
-                #Romper el muro entre la celda actual y la siguiente
-                laberinto[y + dy//2][x + dx//2] = CAMINO
-                crear_camino(nx, ny)
-
-    crear_camino(1, 1)
+            if (1 <= nx < self.columnas) and (1 <= ny < self.filas - 1) and (self.laberinto[ny][nx] == EDIFICIO):
+                self.laberinto[y + dy // 2][x + dx // 2] = CAMINO
+                self.crear_camino(nx, ny)
+                
+    def generar(self):
+        #Genera el camino principal
+        self.crear_camino(1, 1)
+        
+        #Creacion de mas caminos
+        for y in range(1, self.filas -1):
+            for x in range(1, self.columnas -1):
+                if self.laberinto[y][x] == EDIFICIO and random.random() < 0.5:
+                    self.laberinto[y][x] = CAMINO
+        return self.laberinto
     
-    #Creacion de mas caminos
-    for y in range(1, filas -1):
-        for x in range(1, columnas - 1):
-            if laberinto[y][x] == EDIFICIO and random.random() < 0.5:
-                laberinto[y][x] = CAMINO
-    return laberinto
-
-#Impresion del laberinto
-def imprimir_laberinto(laberinto):
-    for i in range(len(laberinto)):
-        for j in range(len(laberinto[i])):
-            match laberinto[i][j]:
-                case 0:
-                    simbolo = "🟩"
-                case 1:
-                    simbolo = "🏢"
-                case 2:
-                    simbolo = "🌊"
-                case 3:
-                    simbolo = "🚧"
-                case 4:
-                    simbolo = "🧍"
-                case 5:
-                    simbolo = "🏁"
-                case 6:
-                    simbolo = "🟥"
-            print(simbolo, end="  ")
-        print("")                                                                              
+    #Impresion del laberinto
+    def imprimir_laberinto(self):
+        for i in range(len(self.laberinto)):
+            for j in range(len(self.laberinto[i])):
+                match self.laberinto[i][j]:
+                    case 0:
+                        simbolo = "🟩"
+                    case 1:
+                        simbolo = "🏢"
+                    case 2:
+                        simbolo = "🌊"
+                    case 3:
+                        simbolo = "🚧"
+                    case 4:
+                        simbolo = "🧍"
+                    case 5:
+                        simbolo = "🏁"
+                    case 6:
+                        simbolo = "🟥"
+                print(simbolo, end="  ")
+            print("")                                                                              
         
 #Insertar cualquier elemento en el laberinto
 def insertar_elementos(laberinto, valor):
