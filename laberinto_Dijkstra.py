@@ -57,7 +57,7 @@ class Laberinto:
 class GeneradorLaberinto:
     """
     Responsabilidad única:
-    - Generar laberintos usando DFSk
+    - Generar laberintos usando DFS
     """
     def __init__(self, probabilidad_camino_extra = 0.5):
         self.__probabilidad = probabilidad_camino_extra
@@ -82,35 +82,42 @@ class GeneradorLaberinto:
         self.__crear_camino(laberinto, 1, 1)
         
         #Creacion de mas caminos
-        for y in range(1, self.filas -1):
-            for x in range(1, self.columnas -1):
-                if self.laberinto[y][x] == EDIFICIO and random.random() < 0.5:
-                    self.laberinto[y][x] = CAMINO
-        return self.laberinto
-    
-    #Impresion del laberinto
-    def imprimir_laberinto(self):
-        for i in range(len(self.laberinto)):
-            for j in range(len(self.laberinto[i])):
-                match self.laberinto[i][j]:
-                    case 0:
-                        simbolo = "🟩"
-                    case 1:
-                        simbolo = "🏢"
-                    case 2:
-                        simbolo = "🌊"
-                    case 3:
-                        simbolo = "🚧"
-                    case 4:
-                        simbolo = "🧍"
-                    case 5:
-                        simbolo = "🏁"
-                    case 6:
-                        simbolo = "🟥"
-                print(simbolo, end="  ")
-            print("")                                                                              
+        for y in range(1, laberinto.filas -1):
+            for x in range(1, laberinto.columnas -1):
+                if laberinto.obtener_celda(y, x) == EDIFICIO and random.random() < self.__probabilidad:
+                    laberinto.asignar_celda(y, x, CAMINO)
+        return Laberinto
+
+class ImpresorLaberinto:
+    """
+    Responsabilidad única:
+    - Mostrar el laberinto en pantalla
+    """
+    def __init__(self):
+        self.__simbolos = {
+            CAMINO : "🟩",
+            EDIFICIO : "🏢",
+            AGUA : "🌊",
+            OBSTACULO : "🚧",
+            INICIO : "🧍‍♂️",
+            FIN : "🏁",
+            RUTA : "🟥"
+        }
         
-#Insertar cualquier elemento en el laberinto
+    def imprimir(self, laberinto):
+        matriz = laberinto.obtener_matriz()
+        
+        for fila in matriz:
+            for celda in fila:
+                print(self.__simbolos.get(celda, "?"), end="  ")
+            print("")                                                                              
+
+class EditorLaberinto:
+    """
+    Responsabilidad única:
+    - Insertar elementos dentro del laberinto con validación.
+    """        
+
 def insertar_elementos(laberinto, valor):
     while True:
         try:
