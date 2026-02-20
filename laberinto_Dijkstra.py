@@ -1,4 +1,7 @@
-import random, heapq, copy
+import random
+import heapq
+import copy
+from abc import ABC, abstractmethod
 
 #Asignacion de valores mediante constantes
 CAMINO = 0
@@ -9,19 +12,58 @@ INICIO = 4
 FIN = 5
 RUTA = 6
 
-class CrearLaberinto:
+class Laberinto:
+    """
+    Responsabilidad Única(Single Responsability Principle (SRP))
+    - Guardar y administrar la matriz del laberinto.
+    - Proveer métodos para acceder/modificar celdas de forma segura.
+    """
     def __init__(self, filas, columnas):
         if columnas % 2 == 0:
             columnas += 1
         if filas % 2 == 0:
             filas += 1
             
-        self.filas = filas
-        self.columnas = columnas
-        self.laberinto = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
+        self.__filas = filas
+        self.__columnas = columnas
+        self.__matriz = [[EDIFICIO for _ in range(columnas)] for _ in range(filas)]
     
-    def crear_camino(self, x, y):
-        self.laberinto[y][x] = CAMINO
+    @property
+    def filas(self):
+        return self.__filas
+    
+    @property
+    def columnas(self):
+        return self.__columnas
+    
+    def obtener_matriz(self):
+        """Abstraccion: devuelve la matriz sin exponer el atributo directamente"""
+        return self.__matriz
+    
+    def dentro_limites(self, fila, columna):
+        return 0 <= fila < self.__filas and 0 <= columna < self.__columnas
+    
+    def obtener_celda(self, fila, columna):
+        return self.__matriz[fila][columna]
+    
+    def asignar_celda(self, fila, columna, valor):
+        self.__matriz[fila][columna] = valor
+    
+    def copiar(self):
+        """Devuelve una copia profunda del laberinto."""
+        nuevo = copy.deepcopy(self)
+        return nuevo
+
+class GeneradorLaberinto:
+    """
+    Responsabilidad única:
+    - Generar laberintos usando DFSk
+    """
+    def __init__(self, probabilidad_camino_extra = 0.5):
+        self.__probabilidad = probabilidad_camino_extra
+    
+    def __crear_camino(self, laberinto, x, y):
+        laberinto.asignar_celda(y, x, CAMINO)
         
         direcciones = [(0, 2), (0, -2), (2, 0), (-2, 0)]
         random.shuffle(direcciones)
@@ -29,13 +71,15 @@ class CrearLaberinto:
         for dx, dy in direcciones:
             ny, nx = dy + y, dx + x
             
-            if (1 <= nx < self.columnas) and (1 <= ny < self.filas - 1) and (self.laberinto[ny][nx] == EDIFICIO):
-                self.laberinto[y + dy // 2][x + dx // 2] = CAMINO
-                self.crear_camino(nx, ny)
+            if (1 <= nx < laberinto.columnas - 1) and (1 <= ny < laberinto.filas - 1) and (laberinto.obtener_celda(ny, nx) == EDIFICIO):
+                laberinto.asignar_celda(y + dy // 2, x + dx // 2, CAMINO)
+                self.__crear_camino(laberinto, nx, ny)
                 
-    def generar(self):
+    def generar(self, filas, columnas):
+        laberinto = Laberinto(filas, columnas)
+        
         #Genera el camino principal
-        self.crear_camino(1, 1)
+        self.__crear_camino(laberinto, 1, 1)
         
         #Creacion de mas caminos
         for y in range(1, self.filas -1):
